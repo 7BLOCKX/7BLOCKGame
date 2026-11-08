@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7BLOCK SHARE HUB</title>
+<style>
+
+*{box-sizing:border-box}
+body{margin:0;background:#080d1b;color:white;font-family:Arial,sans-serif;text-shadow:0 0 8px #00c9ed}
+body.light{text-shadow:0 0 8px #000}
+.project,.project *{text-shadow:none!important}
+header{text-align:center;padding:22px 10px;background:#101a30;position:relative}
+.logo{font-size:38px;font-weight:900;color:#00eaff}
+header p{margin:5px;color:#b9d9ff}
+main{max-width:1000px;margin:auto;padding:15px}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+input,select,textarea{width:100%;padding:12px;border:1px solid #344563;border-radius:9px;background:#111d32;color:white;margin:6px 0}
+button{padding:11px 15px;border:0;border-radius:8px;background:#00c9ed;color:#00121c;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+.search{flex:1;min-width:170px}
+.menu-wrap{position:absolute;top:10px;left:10px;z-index:20;text-align:left}
+.menu-wrap>button{padding:9px 14px;font-size:18px;line-height:1}
+.menu{display:none;position:absolute;left:0;top:46px;background:#17243c;padding:10px;border-radius:10px;z-index:5;width:170px}
+.menu button{width:100%;margin:4px 0}
+.categories{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0}
+.categories button{background:#243653;color:white}
+.categories button.active{background:#00c9ed;color:#00121c}
+.panel,.project{background:#111d32;border:1px solid #263b5d;border-radius:13px;padding:15px;margin:15px 0}
+#uploadPanel{display:none;scroll-margin-top:15px}
+.project h3{margin-top:0;color:#00eaff}
+.project small{color:#9db4d4}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.secondary{background:#344761;color:white}
+.actions button.voted{background:#00c9ed;color:#00121c;box-shadow:0 0 0 2px #fff inset}
+.actions button.voted-down{background:#ef5265;color:#fff;box-shadow:0 0 0 2px #fff inset}
+.danger{background:#ef5265;color:white}
+#commandPanel{display:none}
+.pw{position:relative}
+.pw input{padding-right:48px}
+.pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;color:#9db4d4;padding:8px;font-size:18px}
+#empty{text-align:center;color:#9db4d4;padding:25px}
+body.light{background:#edf2fa;color:#172033}
+body.light header,body.light .panel,body.light .project{background:white;color:#172033}
+body.light input,body.light select,body.light textarea{background:#f3f6fb;color:#000;border-color:#b9c6da}
+body.light,body.light h1,body.light h2,body.light h3,body.light p,body.light small,body.light label,
+body.light .logo,body.light header p,body.light .project h3,body.light .project small,
+body.light .logo{color:#000}
+body.light .logo,body.light header p,body.light .project h3,body.light .project small,body.light .title-link,
+body.light .field-label,body.light .modal-card label,body.light .pubnote,body.light #empty,body.light .modal-card h2{color:#000}
+body.light .secondary,body.light .categories button:not(.active){background:#dbe4f2;color:#000}
+body.light .menu{background:#fff;border:1px solid #b9c6da}
+body.light .modal-card{background:#fff;color:#000}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;overflow:auto;padding:20px 14px}
+.modal-card{max-width:420px;margin:30px auto;background:#111d32;border:1px solid #263b5d;border-radius:16px;padding:20px}
+.modal-card h2{margin:0 0 6px}
+.modal-card label{display:block;font-size:13px;color:#b9d9ff;margin-top:10px}
+.modal-card .row{display:flex;gap:8px;margin-top:14px}
+.modal-card .row button{flex:1}
+#cMsg{display:none;margin-top:12px;padding:10px;border-radius:9px;font-size:14px}
+#cMsg.ok{display:block;background:rgba(0,201,237,.12);border:1px solid #00c9ed;color:#bff4ff}
+body.light #cMsg.ok{color:#00323d}
+#profMsg{display:none;margin-top:12px;padding:10px;border-radius:9px;font-size:14px}
+#profMsg.ok{display:block;background:rgba(0,201,237,.12);border:1px solid #00c9ed;color:#bff4ff}
+body.light #profMsg.ok{color:#00323d}
+.pick-btn{display:inline-block;padding:11px 15px;border-radius:8px;background:#00c9ed;color:#00121c;font-weight:bold;cursor:pointer;font-size:14px}
+.file-hidden{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;padding:0;margin:0;border:0;pointer-events:none}
+.thumb-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0}
+.thumb-prev{width:120px;height:70px;border-radius:10px;border:1px dashed #344563;background:#0a1224 center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#6f86a8;font-size:12px;text-align:center}
+.img-list{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.img-item{position:relative;width:72px;height:72px;border-radius:9px;overflow:hidden;border:1px solid #344563}
+.img-item img{width:100%;height:100%;object-fit:cover;display:block}
+.img-item b{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:13px;line-height:22px;text-align:center;cursor:pointer}
+.field-label{display:block;font-size:13px;color:#b9d9ff;margin-top:12px}
+.card-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:12px;display:block;background:#0a1224}
+.card-imgs{display:flex;gap:8px;overflow-x:auto;margin:10px 0}
+.card-imgs img{height:80px;width:auto;border-radius:8px;cursor:pointer;flex:0 0 auto;border:1px solid #263b5d}
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;align-items:center;justify-content:center;padding:12px}
+#lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+#lightbox .x{position:absolute;top:12px;right:14px;width:42px;height:42px;border-radius:50%;background:#ef5265;color:#fff;font-size:22px;line-height:42px;text-align:center;cursor:pointer}
+body.light .field-label{color:#000}
+body.light .thumb-prev{background-color:#f3f6fb;color:#000;border-color:#b9c6da}
+
+.owner-bar{display:none;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0;padding:10px 12px;border:1px dashed #00c9ed;border-radius:10px;color:#bff4ff;font-size:14px}
+body.light .owner-bar{color:#000}
+.pubnote{font-size:13px;color:#9db4d4;margin:6px 0}
+body.light .pubnote{color:#000}
+.err{display:none;background:rgba(239,82,101,.15);border:1px solid #ef5265;color:#ffb3bc;border-radius:9px;padding:10px;font-size:14px;margin-top:12px}
+body.light .err{color:#7a0f1c}
+.cbox{margin-top:12px;padding-top:12px;border-top:1px solid #263b5d}
+.clist{max-height:220px;overflow-y:auto;margin-bottom:8px}
+.clist p{margin:6px 0;word-break:break-word}
+body.light .cbox{border-color:#b9c6da}
+.foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:20px 10px 30px}
+.title-link{cursor:pointer;text-decoration:underline}
+
+/* ===== New button design ===== */
+button,.pick-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 18px;border:0;border-radius:999px;
+  background:linear-gradient(135deg,#00eaff,#0090ff);color:#00121c;
+  font-weight:700;font-size:14px;letter-spacing:.3px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,170,255,.35),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+button:hover,.pick-btn:hover{filter:brightness(1.08);box-shadow:0 6px 18px rgba(0,170,255,.5),inset 0 1px 0 rgba(255,255,255,.35)}
+button:active,.pick-btn:active{transform:scale(.95);box-shadow:0 2px 6px rgba(0,170,255,.3)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:linear-gradient(135deg,#3a4f70,#26364f);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12)}
+.secondary:hover{box-shadow:0 6px 16px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12)}
+.danger{background:linear-gradient(135deg,#ff6b7d,#e0243d);color:#fff;box-shadow:0 4px 14px rgba(239,82,101,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.danger:hover{box-shadow:0 6px 18px rgba(239,82,101,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+.actions button.voted{background:linear-gradient(135deg,#00eaff,#0090ff);color:#00121c;box-shadow:0 0 0 2px #fff inset,0 4px 14px rgba(0,170,255,.5)}
+.actions button.voted-down{background:linear-gradient(135deg,#ff6b7d,#e0243d);color:#fff;box-shadow:0 0 0 2px #fff inset,0 4px 14px rgba(239,82,101,.5)}
+.menu-wrap>button{width:46px;height:46px;padding:0;font-size:24px;border-radius:14px}
+.menu{border:1px solid #2c4166;box-shadow:0 10px 30px rgba(0,0,0,.5);border-radius:16px;width:190px;top:54px}
+.menu button{width:100%;margin:5px 0}
+.pw .eye{background:transparent;box-shadow:none;color:#9db4d4;padding:8px;border-radius:50%}
+.pw .eye:hover{box-shadow:none;background:rgba(255,255,255,.08)}
+#newBtn{padding:12px 20px}
+.modal-card .row button{padding:13px 10px}
+body.light .secondary{background:linear-gradient(135deg,#eef3fb,#d3deef);color:#000;box-shadow:0 3px 10px rgba(30,60,110,.18),inset 0 1px 0 #fff}
+body.light .menu{border-color:#b9c6da;box-shadow:0 10px 30px rgba(30,60,110,.25)}
+body.light .pw .eye{color:#334}
+
+/* ===== New website look (dark + white) ===== */
+body{
+  background:radial-gradient(1200px 600px at 10% -10%,rgba(0,170,255,.18),transparent 60%),
+             radial-gradient(900px 500px at 100% 0%,rgba(120,80,255,.16),transparent 55%),#060a16;
+  background-attachment:fixed;min-height:100vh;
+}
+header{
+  background:linear-gradient(180deg,rgba(16,26,48,.95),rgba(10,18,36,.85));
+  padding:34px 10px 30px;border-bottom:1px solid rgba(0,200,255,.25);
+  box-shadow:0 10px 40px rgba(0,150,255,.12);backdrop-filter:blur(8px);
+}
+.logo{font-size:44px;letter-spacing:4px}
+main{max-width:760px;padding:20px 16px 40px}
+input,select,textarea{
+  border-radius:14px;border:1px solid #2c4166;background:rgba(17,29,50,.85);
+  padding:13px 16px;transition:border-color .15s,box-shadow .15s;font-size:15px;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#00c9ed;box-shadow:0 0 0 3px rgba(0,201,237,.25)}
+.panel,.project{
+  background:linear-gradient(160deg,rgba(21,35,60,.95),rgba(14,24,44,.95));
+  border:1px solid rgba(0,200,255,.18);border-radius:20px;padding:18px;
+  box-shadow:0 8px 28px rgba(0,0,0,.35);
+}
+.project{animation:cardIn .35s ease both;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+.project:hover{transform:translateY(-3px);border-color:rgba(0,220,255,.5);box-shadow:0 14px 34px rgba(0,150,255,.22)}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.project h3{font-size:21px;margin-bottom:4px}
+.project small{display:inline-block;margin:2px 0 8px;padding:3px 10px;border-radius:999px;background:rgba(0,201,237,.12);border:1px solid rgba(0,201,237,.3)}
+.project p{line-height:1.5}
+.card-thumb{border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.modal{background:rgba(3,6,14,.75);backdrop-filter:blur(6px)}
+.modal-card{background:linear-gradient(160deg,#16253f,#0f1a30);border:1px solid rgba(0,200,255,.25);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.clist{padding-right:4px}
+.clist p{background:rgba(255,255,255,.04);border-radius:12px;padding:8px 12px}
+.cbox{border-top:1px solid rgba(0,200,255,.18)}
+#empty{border:1px dashed #2c4166;border-radius:18px}
+
+body.light{
+  background:radial-gradient(1000px 500px at 0% -10%,rgba(0,170,255,.22),transparent 60%),
+             radial-gradient(800px 500px at 100% 0%,rgba(150,110,255,.18),transparent 55%),#eef3fb;
+  background-attachment:fixed;
+}
+body.light header{background:linear-gradient(180deg,#ffffff,#f1f6ff);border-bottom:1px solid #c9d8ee;box-shadow:0 8px 30px rgba(40,90,160,.12)}
+body.light .panel,body.light .project{background:linear-gradient(160deg,#ffffff,#f4f8ff);border:1px solid #d3dff0;box-shadow:0 8px 24px rgba(40,90,160,.12)}
+body.light .project:hover{border-color:#6ab8ff;box-shadow:0 14px 32px rgba(40,120,220,.22)}
+body.light .project small{background:rgba(0,120,200,.08);border-color:rgba(0,120,200,.3)}
+body.light input,body.light select,body.light textarea{background:#fff;border-color:#c3d2e8}
+body.light input:focus,body.light select:focus,body.light textarea:focus{border-color:#0090ff;box-shadow:0 0 0 3px rgba(0,144,255,.2)}
+body.light .modal{background:rgba(220,230,245,.7)}
+body.light .modal-card{background:linear-gradient(160deg,#fff,#f1f6ff);border-color:#c9d8ee;box-shadow:0 20px 60px rgba(40,90,160,.3)}
+body.light .clist p{background:#eef3fb}
+body.light .cbox{border-color:#d3dff0}
+body.light #empty{border-color:#c3d2e8}
+
+/* ===== Right-side comment box ===== */
+#cDrawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,88vw);z-index:150;display:flex;flex-direction:column;gap:6px;
+  padding:16px;background:linear-gradient(160deg,#16253f,#0d1830);border-left:1px solid rgba(0,200,255,.3);
+  box-shadow:-14px 0 40px rgba(0,0,0,.55);transform:translateX(105%);transition:transform .25s ease}
+#cDrawer.open{transform:none}
+#cDrawer,#cDrawer *{text-shadow:none!important}
+#cDrawer .cd-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:18px;color:#00eaff;margin-bottom:6px}
+#cDrawer .cd-head button{width:38px;height:38px;padding:0;flex:0 0 auto}
+#cDrawer .clist{flex:1;max-height:none;margin-bottom:4px}
+body.light #cDrawer{background:linear-gradient(160deg,#fff,#eef4ff);color:#000;border-left-color:#c9d8ee;box-shadow:-14px 0 40px rgba(40,90,160,.25)}
+body.light #cDrawer .cd-head{color:#000}
+
+/* ===== Compact action row, Share on the right ===== */
+.actions{gap:6px;align-items:center}
+.actions button{padding:9px 11px;font-size:13px}
+.actions .share-btn{margin-left:auto;font-size:16px;padding:8px 13px}
+
+/* ===== White mode: softer, less white ===== */
+body.light{
+  background:radial-gradient(1000px 500px at 0% -10%,rgba(0,140,220,.16),transparent 60%),
+             radial-gradient(800px 500px at 100% 0%,rgba(130,100,230,.14),transparent 55%),#d4dbe7;
+  background-attachment:fixed;
+}
+body.light header{background:linear-gradient(180deg,#e3e9f3,#d6deeb);border-bottom:1px solid #b4c2d8;box-shadow:0 8px 26px rgba(40,70,120,.14)}
+body.light .panel,body.light .project{background:linear-gradient(160deg,#e9eef6,#dde5f0);border:1px solid #bccadd;box-shadow:0 8px 22px rgba(40,70,120,.14)}
+body.light .project:hover{border-color:#5fa8e8;box-shadow:0 14px 30px rgba(40,100,190,.2)}
+body.light input,body.light select,body.light textarea{background:#eef1f6;border-color:#b0bfd5}
+body.light .modal{background:rgba(190,202,222,.72)}
+body.light .modal-card{background:linear-gradient(160deg,#e9eef6,#dbe3ef);border-color:#b4c2d8}
+body.light .secondary{background:linear-gradient(135deg,#e1e8f2,#c5d1e3);box-shadow:0 3px 10px rgba(40,70,120,.2),inset 0 1px 0 rgba(255,255,255,.7)}
+body.light .menu{background:#e3e9f3;border-color:#b0bfd5}
+body.light #cDrawer{background:linear-gradient(160deg,#e9eef6,#d9e1ee);border-left-color:#b4c2d8}
+body.light .clist p{background:#d9e1ee}
+body.light #empty{border-color:#b0bfd5}
+body.light .thumb-prev{background-color:#e3e9f3;border-color:#b0bfd5}
+
+/* ===== Dark mode: live animated background ===== */
+body:not(.light){background:#04070f}
+body:not(.light)::before{
+  content:"";position:fixed;inset:-25%;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(circle at 20% 30%,rgba(0,110,255,.30),transparent 38%),
+    radial-gradient(circle at 80% 20%,rgba(130,60,255,.26),transparent 38%),
+    radial-gradient(circle at 65% 80%,rgba(0,210,190,.18),transparent 38%),
+    radial-gradient(circle at 10% 85%,rgba(255,60,140,.12),transparent 35%);
+  animation:liveBg 16s ease-in-out infinite alternate;
+}
+body:not(.light)::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.7;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px,#7fe9ff,transparent),
+    radial-gradient(1.5px 1.5px at 90px 120px,#b79bff,transparent),
+    radial-gradient(1px 1px at 160px 60px,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 230px 170px,#7fe9ff,transparent),
+    radial-gradient(1px 1px at 60px 200px,#fff,transparent);
+  background-size:260px 240px;
+  animation:liveDots 28s linear infinite;
+}
+@keyframes liveBg{
+  0%{transform:translate(0,0) scale(1) rotate(0)}
+  50%{transform:translate(5%,-4%) scale(1.15) rotate(4deg)}
+  100%{transform:translate(-5%,5%) scale(1.05) rotate(-4deg)}
+}
+@keyframes liveDots{from{background-position:0 0}to{background-position:-260px -240px}}
+@media (prefers-reduced-motion:reduce){body:not(.light)::before,body:not(.light)::after{animation:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="menu-wrap">
+    <button onclick="toggleMenu(event)" aria-label="Menu">&#8942;</button>
+    <div class="menu" id="menu">
+      <button class="secondary" id="mOwnerLogin" onclick="closeMenu();openOwnerLogin()">Owner Login</button>
+      <button class="danger" id="mOwnerLogout" style="display:none" onclick="closeMenu();ownerLogout()">Owner Logout</button>
+      <button class="secondary" onclick="closeMenu();toggleTheme()">Dark / White</button>
+    </div>
+  </div>
+  <div class="logo">7BLOCK</div>
+</header>
+
+<main id="app">
+  <div class="top">
+    <input class="search" id="search" placeholder="Search projects..." oninput="renderProjects()">
+    <button id="newBtn" style="display:none" onclick="openNewProject()">+ New Project</button>
+  </div>
+
+  <section class="panel" id="uploadPanel">
+    <h2 id="formTitle">Upload New Project</h2>
+    <input id="pName" placeholder="Project title">
+    <textarea id="pDescription" placeholder="Project description"></textarea>
+    <input id="pLink" placeholder="Project link (optional)">
+    <span class="field-label">Project image (optional)</span>
+    <div class="thumb-box">
+      <div class="thumb-prev" id="pPrev">No image</div>
+      <label class="pick-btn">Choose image<input class="file-hidden" type="file" id="pImage" accept="image/*" onchange="pickImage(this)"></label>
+      <button type="button" class="secondary" onclick="clearImage()">Remove</button>
+    </div>
+    <select id="pPrivacy">
+      <option value="Public">Public</option>
+      <option value="Private">Private (only me)</option>
+    </select>
+    <button onclick="saveProject()" id="saveButton">Upload</button>
+    <button class="secondary" onclick="closeUpload()">Cancel</button>
+    <button class="danger" id="delBtn" style="display:none" onclick="deleteFromEdit()">Delete project</button>
+  </section>
+
+  <section id="projects"></section>
+
+</main>
+
+<aside id="cDrawer">
+  <div class="cd-head"><b id="cdTitle"></b><button class="secondary" onclick="closeDrawer()" aria-label="Close">&#10005;</button></div>
+  <div class="clist" id="cdList"></div>
+  <input id="cdName" placeholder="Your name">
+  <textarea id="cdText" rows="3" placeholder="Write a comment..."></textarea>
+  <button onclick="sendComment()">Send comment</button>
+</aside>
+
+<div class="modal" id="ownerModal">
+  <div class="modal-card">
+    <h2 id="ownerTitle">Owner Login</h2>
+    <p class="pubnote">Enter your owner code</p>
+    <div class="pw">
+      <input id="ownerPw" type="password" maxlength="20" autocomplete="off">
+      <button type="button" class="eye" onclick="togglePw('ownerPw',this)">👁</button>
+    </div>
+    <div class="err" id="ownerErr"></div>
+    <div class="row">
+      <button onclick="ownerSubmit()">Continue</button>
+      <button class="secondary" onclick="closeOwnerLogin()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="contactModal">
+  <div class="modal-card">
+    <h2>Contact / Feedback</h2>
+    <label>Name</label>
+    <input id="cName" placeholder="Your name">
+    <label>Gmail</label>
+    <input id="cEmail" type="email" placeholder="yourname@gmail.com">
+    <label>Message</label>
+    <textarea id="cMessage" rows="5" placeholder="Write your message..."></textarea>
+    <input type="checkbox" id="cBot" style="display:none" tabindex="-1" autocomplete="off">
+    <div id="cMsg"></div>
+    <div class="row">
+      <button id="cSend" onclick="sendContact()">Send</button>
+      <button class="secondary" onclick="closeContact()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="deleteModal">
+  <div class="modal-card">
+    <h2>Delete project?</h2>
+    <p>Delete <b id="delName"></b>? This cannot be undone.</p>
+    <div class="row">
+      <button class="danger" onclick="confirmDelete()">Delete</button>
+      <button class="secondary" onclick="cancelDelete()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ===== Games shown to EVERY visitor. Owner pastes "publish data" here. ===== */
+const PUBLISHED_GAMES=[{"id":1762560000000,"name":"Thimdal","description":"","link":"","privacy":"Public","likes":0,"dislikes":0}];
+
+const WEB3FORMS_KEY="c078f96e-1a61-40a7-9c58-49d7dd8c74ad";
+
+let isOwner=sessionStorage.getItem("7block_owner")==="1";
+let myGames=JSON.parse(localStorage.getItem("7block_projects")||"[]");   // owner's local drafts
+let reactions=JSON.parse(localStorage.getItem("7block_reactions")||"{}"); // per-device likes/comments
+let editingId=null,commandProjectId=null,deleteId=null;
+
+function allGames(){
+  const pub=PUBLISHED_GAMES.filter(p=>!myGames.some(m=>m.id===p.id));
+  return isOwner?[...myGames,...pub]:PUBLISHED_GAMES.filter(p=>p.privacy!=="Private");
+}
+function saveData(){localStorage.setItem("7block_projects",JSON.stringify(myGames))}
+function saveReactions(){localStorage.setItem("7block_reactions",JSON.stringify(reactions))}
+function R(id){return reactions[id]=reactions[id]||{vote:0,comments:[]}}
+
+/* ---------- Owner login (password hash stored on owner's device) ---------- */
+const OWNER_HASHES=["496172b42fe0a9e9d0a742ea5e0bcdd944f7c5aa92dcdedd83e2e41afcab8129","f2014794079"];
+async function sha(t){
+  try{
+    const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("7block|"+t));
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+  }catch(e){
+    let h=5381;for(const c of "7block|"+t)h=((h<<5)+h+c.charCodeAt(0))>>>0;return "f"+h;
+  }
+}
+function ownerErr(t){const e=document.getElementById("ownerErr");e.textContent=t;e.style.display=t?"block":"none"}
+function openOwnerLogin(){
+  
+  document.getElementById("ownerPw").value="";ownerErr("");
+  document.getElementById("ownerModal").style.display="block";
+}
+function closeOwnerLogin(){document.getElementById("ownerModal").style.display="none"}
+async function ownerSubmit(){
+  const code=document.getElementById("ownerPw").value.trim().toUpperCase();
+  if(!OWNER_HASHES.includes(await sha(code))){ownerErr("Wrong owner code");return}
+  sessionStorage.setItem("7block_owner","1");isOwner=true;
+  closeOwnerLogin();applyOwnerUI();renderProjects();
+}
+function ownerLogout(){
+  sessionStorage.removeItem("7block_owner");isOwner=false;
+  
+  closeUpload();applyOwnerUI();renderProjects();
+}
+function applyOwnerUI(){
+  document.getElementById("newBtn").style.display=isOwner?"":"none";
+  document.getElementById("mOwnerLogin").style.display=isOwner?"none":"";
+  document.getElementById("mOwnerLogout").style.display=isOwner?"":"none";
+}
+function togglePw(id,btn){
+  const i=document.getElementById(id),show=i.type==="password";
+  i.type=show?"text":"password";btn.textContent=show?"🙈":"👁";
+}
+async function exportPublish(){
+  const data=JSON.stringify(allGames().filter(p=>p.privacy!=="Private").map(({votes,...g})=>g));
+  const text="const PUBLISHED_GAMES="+data+";";
+  try{await navigator.clipboard.writeText(text);alert("Publish data copied. Replace the PUBLISHED_GAMES line in your HTML file with it.")}
+  catch(e){prompt("Copy this and replace the PUBLISHED_GAMES line:",text)}
+}
+
+/* ---------- Contact ---------- */
+function cMsg(t,type){const m=document.getElementById("cMsg");m.textContent=t;m.className=t?type:""}
+function openContact(){
+  
+  ["cName","cEmail","cMessage"].forEach(i=>document.getElementById(i).value="");
+  cMsg("");document.getElementById("cSend").disabled=false;
+  document.getElementById("contactModal").style.display="block";
+}
+function closeContact(){document.getElementById("contactModal").style.display="none"}
+async function sendContact(){
+  const name=document.getElementById("cName").value.trim();
+  const email=document.getElementById("cEmail").value.trim();
+  const message=document.getElementById("cMessage").value.trim();
+  if(!name||!email||!message){cMsg("Fill name, Gmail and message","err");return}
+  const btn=document.getElementById("cSend");btn.disabled=true;cMsg("Sending...","ok");
+  try{
+    const r=await fetch("https://api.web3forms.com/submit",{
+      method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+      body:JSON.stringify({access_key:WEB3FORMS_KEY,subject:"7BLOCK SHARE HUB - New message",from_name:"7BLOCK SHARE HUB",name,email,message,botcheck:document.getElementById("cBot").checked})
+    });
+    const d=await r.json();
+    if(d.success){cMsg("Message sent ✔","ok");document.getElementById("cMessage").value=""}
+    else cMsg(d.message||"Could not send. Try again.","err");
+  }catch(e){cMsg("Network error. Check internet and try again.","err")}
+  btn.disabled=false;
+}
+
+/* ---------- Image + type helpers ---------- */
+let pImgData="";
+function setPrev(){
+  const el=document.getElementById("pPrev");
+  if(pImgData){el.style.backgroundImage='url("'+pImgData+'")';el.textContent=""}
+  else{el.style.backgroundImage="";el.textContent="No image"}
+}
+function pickImage(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const im=new Image();
+    im.onload=()=>{
+      const k=Math.min(1,640/Math.max(im.width,im.height));
+      const c=document.createElement("canvas");
+      c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      pImgData=c.toDataURL("image/jpeg",0.8);setPrev();
+    };
+    im.src=rd.result;
+  };
+  rd.readAsDataURL(f);inp.value="";
+}
+function clearImage(){pImgData="";setPrev()}
+
+/* ---------- Upload / edit / delete (owner only) ---------- */
+function openNewProject(){
+  if(!isOwner)return;
+  editingId=null;
+  document.getElementById("formTitle").textContent="Upload New Project";
+  document.getElementById("saveButton").textContent="Upload";
+  ["pName","pDescription","pLink"].forEach(i=>document.getElementById(i).value="");
+  document.getElementById("pPrivacy").value="Public";
+  pImgData="";setPrev();
+  document.getElementById("delBtn").style.display="none";
+  const panel=document.getElementById("uploadPanel");
+  panel.style.display="block";
+  setTimeout(()=>{panel.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("pName").focus({preventScroll:true})},100);
+}
+function closeUpload(){document.getElementById("uploadPanel").style.display="none";document.getElementById("delBtn").style.display="none";editingId=null}
+function deleteFromEdit(){if(editingId!==null)deleteProject(editingId)}
+function saveProject(){
+  if(!isOwner){alert("Only the owner can upload");return}
+  const name=document.getElementById("pName").value.trim();
+  const description=document.getElementById("pDescription").value.trim();
+  const link=document.getElementById("pLink").value.trim();
+  if(!name){alert("Enter project title");return}
+  const backup=JSON.stringify(myGames),wasEditing=editingId!==null;
+  const data={name,description,link,privacy:document.getElementById("pPrivacy").value,image:pImgData};
+  if(wasEditing){
+    let p=myGames.find(x=>x.id===editingId);
+    if(p)Object.assign(p,data);
+    else myGames.unshift({id:editingId,...data}); // editing a published game: keep a local copy
+  }else myGames.unshift({id:Date.now(),...data});
+  try{saveData()}catch(e){myGames=JSON.parse(backup);alert("Storage is full. ");return}
+  closeUpload();renderProjects();
+  alert(wasEditing?"Project updated!":"Project uploaded!");
+}
+function editProject(id){
+  if(!isOwner)return;
+  const p=allGames().find(x=>x.id===id);if(!p)return;
+  editingId=id;
+  document.getElementById("formTitle").textContent="Edit Project";
+  document.getElementById("saveButton").textContent="Save Changes";
+  document.getElementById("pName").value=p.name;
+  document.getElementById("pDescription").value=p.description||"";
+  document.getElementById("pLink").value=p.link||"";
+  document.getElementById("pPrivacy").value=p.privacy||"Public";
+  pImgData=p.image||"";setPrev();
+  document.getElementById("delBtn").style.display="";
+  const panel=document.getElementById("uploadPanel");
+  panel.style.display="block";
+  setTimeout(()=>{panel.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("pName").focus({preventScroll:true})},100);
+}
+function deleteProject(id){
+  if(!isOwner)return;
+  const p=allGames().find(x=>x.id===id);if(!p)return;
+  deleteId=id;document.getElementById("delName").textContent=p.name;
+  document.getElementById("deleteModal").style.display="block";
+}
+function cancelDelete(){deleteId=null;document.getElementById("deleteModal").style.display="none"}
+function confirmDelete(){
+  const id=deleteId;cancelDelete();if(id===null||!isOwner)return;
+  myGames=myGames.filter(x=>x.id!==id);
+  const i=PUBLISHED_GAMES.findIndex(x=>x.id===id);
+  if(i>-1)PUBLISHED_GAMES.splice(i,1); // hidden for this session; remove from file to delete for everyone
+  if(openId===id)closeDrawer();
+  if(editingId===id)closeUpload();
+  saveData();renderProjects();
+}
+
+/* ---------- Render ---------- */
+function renderProjects(){
+  const box=document.getElementById("projects");box.innerHTML="";
+  const search=document.getElementById("search").value.toLowerCase();
+  const list=allGames().filter(p=>(p.name.toLowerCase().includes(search)||(p.description||"").toLowerCase().includes(search)));
+  if(!list.length){box.innerHTML='<div id="empty">No projects yet.</div>';return}
+  list.forEach(p=>{
+    const r=R(p.id),mine=r.vote;
+    const likes=(p.likes||0)+(mine===1?1:0),dislikes=(p.dislikes||0)+(mine===-1?1:0);
+    const card=document.createElement("div");card.className="project";
+    card.innerHTML=`
+      <h3></h3><small></small><p></p>
+      <div class="actions">
+        <button class="${mine===1?'voted':'secondary'}" onclick="vote(${p.id},1)">👍 ${likes}</button>
+        <button class="${mine===-1?'voted-down':'secondary'}" onclick="vote(${p.id},-1)">👎 ${dislikes}</button>
+        <button class="secondary" onclick="toggleComments(${p.id})">Comments (${r.comments.length})</button>
+        <button class="secondary share-btn" title="Share" aria-label="Share" onclick="shareProject(${p.id})">🔗</button>
+        ${isOwner?`<button class="secondary" onclick="editProject(${p.id})">Edit</button>`:""}
+      </div>`;
+    const h=card.querySelector("h3");h.textContent=p.name;
+    if(p.link){h.classList.add("title-link");h.title="Open";h.onclick=()=>openProject(p.id)}
+    card.querySelector("small").textContent=(p.privacy||"Public");
+    if(p.image){const im=document.createElement("img");im.className="card-thumb";im.src=p.image;im.alt=p.name;card.prepend(im)}
+    card.querySelector("p").textContent=p.description||"";
+    card.id="p"+p.id;
+    box.appendChild(card);
+  });
+}
+function vote(id,v){const r=R(id);r.vote=r.vote===v?0:v;saveReactions();renderProjects()}
+function openProject(id){
+  const p=allGames().find(x=>x.id===id);if(!p||!p.link)return;
+  let url=p.link.trim();if(!/^https?:\/\//i.test(url))url="https://"+url;
+  window.open(url,"_blank","noopener");
+}
+
+/* ---------- Comments (right-side box) ---------- */
+let openId=null;
+function toggleComments(id){
+  openId=id;renderDrawer();
+  document.getElementById("cDrawer").classList.add("open");
+}
+function closeDrawer(){openId=null;document.getElementById("cDrawer").classList.remove("open")}
+function renderDrawer(){
+  if(openId===null)return;
+  const p=allGames().find(x=>x.id===openId);if(!p){closeDrawer();return}
+  document.getElementById("cdTitle").textContent=p.name;
+  const list=document.getElementById("cdList");list.innerHTML="";
+  const c=R(p.id).comments;
+  if(!c.length){const e=document.createElement("p");e.textContent="No comments yet.";list.appendChild(e)}
+  c.forEach(x=>{const d=document.createElement("p");const b=document.createElement("b");b.textContent=x.user+": ";d.append(b,document.createTextNode(x.text));list.appendChild(d)});
+  list.scrollTop=list.scrollHeight;
+  const nm=document.getElementById("cdName");
+  if(!nm.value)nm.value=localStorage.getItem("7block_cname")||"";
+}
+function sendComment(){
+  if(openId===null)return;
+  const nm=document.getElementById("cdName"),tx=document.getElementById("cdText");
+  const text=tx.value.trim();if(!text)return;
+  R(openId).comments.push({user:nm.value.trim()||"Guest",text});
+  localStorage.setItem("7block_cname",nm.value.trim());
+  tx.value="";saveReactions();renderDrawer();renderProjects();
+}
+
+/* ---------- Share ---------- */
+async function shareProject(id){
+  const p=allGames().find(x=>x.id===id);if(!p)return;
+  const url=location.href.split("#")[0]+"#p"+id;
+  try{if(navigator.share){await navigator.share({title:p.name,text:p.name+" - 7BLOCK",url});return}}
+  catch(e){if(e&&e.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(url);alert("Link copied!")}
+  catch(e){prompt("Copy this link:",url)}
+}
+
+/* ---------- Misc ---------- */
+function toggleMenu(e){e.stopPropagation();const m=document.getElementById("menu");m.style.display=m.style.display==="block"?"none":"block"}
+function closeMenu(){document.getElementById("menu").style.display="none"}
+document.addEventListener("click",e=>{if(!e.target.closest(".menu-wrap"))closeMenu()});
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("7block_theme",document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("7block_theme")==="light")document.body.classList.add("light");
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("ownerModal").style.display==="block")ownerSubmit()});
+applyOwnerUI();renderProjects();
+if(location.hash.startsWith("#p")){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+</script>
+</body>
+</html>
